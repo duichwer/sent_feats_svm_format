@@ -142,7 +142,14 @@ class SentenceFeatureCreator:
             way to access the non-terminal nodes, though, so using NLTK seems the best approach.
             We use spaCy for the rest because we like the API and speed.
             """
-        tree = Tree.fromstring(span._.parse_string)
+
+        try:
+            # Replace all whitespaces with single space to ensure newlines don't mess things up
+            str_repr = ' '.join(span._.parse_string.split())
+            tree = Tree.fromstring(str_repr)
+        except ValueError:
+            logger.warning(f"Something went wrong when trying to parse the Tree for span {span}."
+                           f" Tree string: {span._.parse_string}")
 
         return tree.height()
 
