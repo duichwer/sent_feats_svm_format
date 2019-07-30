@@ -4,6 +4,7 @@ from pathlib import Path
 
 from benepar.spacy_plugin import BeneparComponent
 from nltk import Tree
+import re
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 import spacy
 from spacy.util import minibatch as mb
@@ -143,13 +144,12 @@ class SentenceFeatureCreator:
             We use spaCy for the rest because we like the API and speed.
             """
 
+        tree_repr = span._.parse_string
         try:
-            # Replace all whitespaces with single space to ensure newlines don't mess things up
-            str_repr = ' '.join(span._.parse_string.split())
-            tree = Tree.fromstring(str_repr)
+            tree = Tree.fromstring(tree_repr)
         except ValueError:
-            logger.warning(f"Something went wrong when trying to parse the Tree for span {span}."
-                           f" Tree string: {span._.parse_string}")
+            tree_repr = re.sub(r'\([^)\s]*\)', '', tree_repr)
+            tree = Tree.fromstring(tree_repr)
 
         return tree.height()
 
