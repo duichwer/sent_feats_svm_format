@@ -148,8 +148,11 @@ class SentenceFeatureCreator:
         try:
             tree = Tree.fromstring(tree_repr)
         except ValueError:
-            tree_repr = re.sub(r'\([^)\s]*\)', '', tree_repr)
-            tree = Tree.fromstring(tree_repr)
+            try:
+                tree_repr = re.sub(r'\([^)\s]*\)', '', tree_repr)
+                tree = Tree.fromstring(tree_repr)
+            except:
+                raise ValueError(f"Sentence: {span}\tparse:{tree_repr}")
 
         return tree.height()
 
